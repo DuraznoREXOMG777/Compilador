@@ -742,7 +742,7 @@ public class Ut {
         {353, 49, -92, 352}, //FUNCIONES 95 toLower
         {351, -30,  317, 350, 22, 316,  -27,  317, 350, 22, 316,  -27, 317, 349,-1, 316, -29, -84}, //FUNCIONES 96
         {348, -30, 317, 347,-1, 316, -29, -85}, //FUNCIONES 97 close ( id )
-        {344, 50, -93, 343}, //FUNCIONES 98 scanf
+        {344, 50, -93, 371}, //FUNCIONES 98 scanf
         {344, 50, -94, 343}, //FUNCIONES 99 printf
         { 317, 340, 22, 316,  -86, 339}, //FUNCIONES 100 asc EXPPASCAL
         { 317, 342, 22, 316, -87, 341}, //FUNCIONES 101 chr EXPPASCAL

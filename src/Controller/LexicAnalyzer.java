@@ -257,6 +257,7 @@ public class LexicAnalyzer {
         LinkedList<Variable> strins = new LinkedList();
         LinkedList<Variable> strcat = new LinkedList();
         Stack<Variable> expo = new Stack();
+        Stack<String> pilaFunciones = new Stack();
 
         boolean strCpy = false;
         boolean strCat = false;
@@ -716,6 +717,16 @@ public class LexicAnalyzer {
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 348) {
                 Variable boolClose = new Variable();
+                
+                Semantica2 sm3 = new Semantica2();
+                sm3.setRegla("close");
+                sm3.setTp("close/15");
+                sm3.setLinea("" + tokenList.getFirst().getLinea());
+                sm3.setAmbito("" + pilaAmbito.peek());
+                sm3.setValorr("bool");
+                sm3.setEstado("Aceptado");
+                valoresSemantica.add(sm3);
+                
                 boolClose.setTipo("bool");
                 if (funcionAnidada > 0 || arrayAnidado > 0) {
                     pilaOperandoArr.push(boolClose);
@@ -731,11 +742,20 @@ public class LexicAnalyzer {
                     } else {
                         expPascalClose = pilaOperando.pop();
                     }
-                    if (expPascalClose.getTipo().equals("file")) {
 
+                    Semantica2 sm2 = new Semantica2();
+                    sm2.setRegla("close-P1");
+                    sm2.setTp("file/5");
+                    sm2.setLinea("" + tokenList.getFirst().getLinea());
+                    sm2.setAmbito("" + pilaAmbito.peek());
+                    sm2.setValorr(Ut.semanticaTresNombre(expPascalClose));
+                    if (expPascalClose.getTipo().equals("file")) {
+                        sm2.setEstado("Aceptado");
                     } else {
+                        sm2.setEstado("Error");
                         errorList.add(new Errores(571, expPascalClose.getTipo(), tokenList.getFirst().getLinea(), "Tipo de identificador erróneo en función 'close', se espera file", "Semántica 3"));
                     }
+                    valoresSemantica.add(sm2);
                 }
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 346) {
@@ -751,33 +771,62 @@ public class LexicAnalyzer {
                 pilaSintactica.pop();
 
             } else if (pilaSintactica.peek() == 345) {
+
                 if (pilaOperando.size() > 0) { //Revisar que tenga algo.
                     Variable expPascalNf = new Variable();
+
                     if (funcionAnidada > 0 || arrayAnidado > 0) {
                         expPascalNf = pilaOperandoArr.pop();
                     } else {
                         expPascalNf = pilaOperando.pop();
                     }
-                    if (expPascalNf.getTipo().equals("file")) {
 
+                    String tipo = pilaFunciones.peek();
+                    Semantica2 sm2 = new Semantica2();
+                    sm2.setRegla(tipo + "-P1");
+                    sm2.setTp("file/5");
+                    sm2.setLinea("" + tokenList.getFirst().getLinea());
+                    sm2.setAmbito("" + pilaAmbito.peek());
+                    sm2.setValorr(Ut.semanticaTresNombre(expPascalNf));
+                    if (expPascalNf.getTipo().equals("file")) {
+                        sm2.setEstado("Aceptado");
                     } else {
+                        sm2.setEstado("Error");
                         errorList.add(new Errores(570, expPascalNf.getTipo(), tokenList.getFirst().getLinea(), "Tipo de identificar erróneo en función 'printf/scanf', se espera file ", "Semántica 3"));
                     }
+                    valoresSemantica.add(sm2);
                 }
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 344) {
-
+                String tipo = pilaFunciones.pop();
                 //Se revisa la lista de los valores.
                 for (int i = 0; i < scanf.size(); i++) {
                     Variable var = scanf.get(i);
+
+                    Semantica2 sm2 = new Semantica2();
+                    sm2.setRegla(tipo + "-P" + (i + 2));
+                    sm2.setTp("valor/6");
+                    sm2.setLinea("" + tokenList.getFirst().getLinea());
+                    sm2.setAmbito("" + pilaAmbito.peek());
+                    sm2.setValorr(Ut.semanticaTresNombre(var));
                     //Aquí o arriba.
                     if (var.getTipo().equals("file")) {
+                        sm2.setEstado("Error");
                         errorList.add(new Errores(570, var.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato erróneo en función 'printf/scanf' ", "Semántica 3"));
-                        break; //Si llega un file deja de marcar loos demás como error.
                     } else {
-
+                        sm2.setEstado("Aceptado");
                     }
+                    valoresSemantica.add(sm2);
                 }
+
+                Semantica2 sm3 = new Semantica2();
+                sm3.setRegla(tipo);
+                sm3.setTp(tipo + "/15");
+                sm3.setLinea("" + tokenList.getFirst().getLinea());
+                sm3.setAmbito("" + pilaAmbito.peek());
+                sm3.setValorr("bool");
+                sm3.setEstado("Aceptado");
+                valoresSemantica.add(sm3);
 
                 //Sigo metiendo el tipo de dato.
                 Variable boolNf = new Variable();
@@ -789,8 +838,10 @@ public class LexicAnalyzer {
                 }
 
                 pilaSintactica.pop();
+            } else if (pilaSintactica.peek() == 371) {
+                pilaFunciones.push("scanf");
             } else if (pilaSintactica.peek() == 343) {
-
+                pilaFunciones.push("printf");
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 342) {
                 if (pilaOperando.size() > 0) { //Revisar que tenga algo.
@@ -800,22 +851,30 @@ public class LexicAnalyzer {
                     } else {
                         expPascalChr = pilaOperando.pop();
                     }
-                    
-                    
-                    
+
                     Semantica2 sm2 = new Semantica2();
                     sm2.setRegla("chr-P1");
                     sm2.setTp("int/2");
                     sm2.setLinea("" + tokenList.getFirst().getLinea());
                     sm2.setAmbito("" + pilaAmbito.peek());
                     sm2.setValorr(Ut.semanticaTresNombre(expPascalChr));
-                    
+
                     if (expPascalChr.getTipo().equals("integer")) {
                         sm2.setEstado("Aceptado");
                     } else {
                         sm2.setEstado("Error");
                         errorList.add(new Errores(569, expPascalChr.getTipo(), tokenList.getFirst().getLinea(), "Tipoo de dato en función 'chr' ", "Semántica 3"));
                     }
+                    valoresSemantica.add(sm2);
+
+                    Semantica2 sm3 = new Semantica2();
+                    sm3.setRegla("chr");
+                    sm3.setTp("chr/11");
+                    sm3.setLinea("" + tokenList.getFirst().getLinea());
+                    sm3.setAmbito("" + pilaAmbito.peek());
+                    sm3.setValorr("integer");
+                    sm3.setEstado("Aceptado");
+                    valoresSemantica.add(sm3);
 
                     Variable chrVariable = new Variable();
                     chrVariable.setTipo("integer");
@@ -851,14 +910,14 @@ public class LexicAnalyzer {
                         errorList.add(new Errores(568, expPascalAsc.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'asc'.", "Semántica 3"));
                     }
                     valoresSemantica.add(sm2);
-                    
+
                     Semantica2 sm3 = new Semantica2();
-                    sm2.setRegla("asc");
-                    sm2.setTp("asc/9");
-                    sm2.setLinea("" + tokenList.getFirst().getLinea());
-                    sm2.setAmbito("" + pilaAmbito.peek());
-                    sm2.setValorr("integer");
-                    sm2.setEstado("Aceptado");
+                    sm3.setRegla("asc");
+                    sm3.setTp("asc/9");
+                    sm3.setLinea("" + tokenList.getFirst().getLinea());
+                    sm3.setAmbito("" + pilaAmbito.peek());
+                    sm3.setValorr("integer");
+                    sm3.setEstado("Aceptado");
                     valoresSemantica.add(sm3);
 
                     Variable ascVariable = new Variable();
