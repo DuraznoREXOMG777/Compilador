@@ -1,0 +1,8 @@
+real,expo,real,real,varian,string,varian,real
+expo,expo,expo,expo,varian,string,varian,expo
+real,expo,integer,integer,varian,string,varian,integer
+real,expo,integer,string,varian,string,varian,char
+varian,varian,varian,varian,varian,varian,varian,varian
+string,string,string,string,varian,string,varian,string
+varian,varian,varian,varian,varian,varian,varian,varian
+real,expo,integer,char,varian,string,varian,varian

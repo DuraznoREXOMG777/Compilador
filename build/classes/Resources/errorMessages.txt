@@ -1,0 +1,47 @@
+Caracter no valido.
+Esperando un digito.
+Esperando operador +,- o un digito.
+Palabra reservada no valida.
+Esperando cualquier caracter a excepcion de  ', tabulador o salto de linea.
+Esperando cualquier caracter excepto salto de linea o tabulador.
+Esperando &.
+Esperando |.
+Error de Sincronizaci�n.
+Se espera program.
+Se espera begin, var, function, procedure o use.
+Se espera use, var o begin.
+Se espera ; o end.
+Se espera begin, var, function, procedure, use o id.
+Se espera begin, var, function, procedure, use o forward
+Se espera id, var o begin.
+Se espera id.
+Se espera , o :
+Se espera (
+Se espera id o ).
+Se espera : o ).
+Se espera const real, const cadena, const caracter, const entero, const exponencial, true, false, not,limpiapantalla, sqrt, sqr, exp, strcmp, strcat, strcopy, strins, strlen, toupper, tolower, open, close, scanf, printf, asc, chr, id, ++, --"
+Se espera +, -, *, /, &&, ||, <, <=, >, >=, ==, !=, ;, ',', ., ) , ], ^, #, end, then, fnpara, do, of, else o romper.
+Se espera const real, const cadena, const caracter, const entero, const exponencial, true, false, not,limpiapantalla, sqrt, sqr, exp, strcmp, strcat, strcopy, strins, strlen, toupper, tolower, open, close, scanf, printf, asc, chr, id, ++, --, + o -"
+Se espera id, const entero, const real, const exponcial, const caracter, const cadena, +, -, ++, --, !, expo, true, false, limpiarpantalla, sqr, sqrt, strins, strlen, open, close, asc, ch, strcmp, strcat, strcpy, toupper, tolower, scanf o printf.
+Se espera +, -, *, /, &&, ||, <, <=, >, >=, ==, !=, ','.', ;, ), ], ^, #, end, then, fnpara, do, of, else, o romper.
+Se espera char, exp, integer, real, string, bool o file.
+Se espera ;, ( o ).
+Se espera ) o ,.
+Se espera id, const entero, const real, const exponencial, const caracter, const cadena, +, -, ++, --, !, ;, begin, end, expo, write, read, if, repeat, for, fnpara, while, case, retur, else, romper, true, false, limpiarpantalla, sqrt, sqr, strins, strlen, open, close, asc, chr, strcmp, strcat, strcpy, toupper, tolower, scanf o printf.
+Se espera ;, (, end, fnpara, else o romper.
+Se espera [ o ).
+Se espera ;, ), end, fnpara, else o romper.
+Se espera id, const entero, const real, const exponencial, const caracter, const cadena, +, -, ++, --, !, ;, begin, end, expo, write, read, if, repeat, until, for, while, case, retur, true, false, limpiarpantalla, sqrt, sqr, strins, strlen, open, close, asc, chr, strcmp, strcat, strcpy, toupper, tolower, scanf o printf.
+Se espera end, else o romper.
+Se esper [.
+Se espera id, const entero, const real, const caracter, const cadena, +, -, ++, --, !, expo, todo, true, false, limpiarpantalla, sqrt, sqr, strins, strlen, open, close, asc, chr, strcmp, strcat, strcpy, toupper, tolower, scanf o printf.
+Se espera +, -, *, /, &&, ||, <, <=, >, >=, ==, !=, ;, ',', ., ), ], =, +=, -=, *=, /=, ^, #, end, then, fnpara, do, of, else, romper, o [.
+Se espera const entero, const entero, const expopnencial, const caracter, const cadena, true o false.
+Se espera =, +=, -=, *= o /=.
+Se espera const entero, const real, const exponencial, const caracter, const cadenam +, -, true o false.
+Se espera const entero o const real.
+Se espera id, const entero, const real, const exponencial, const caracter, const cadena, ++, --, !, expo, true, false, limpiarpantalla, sqrt, sqr, strins, strlen, open, close, asc, chr, strcmp, strcat, strcpy, toupper, tolower, scanf o printf.
+Se espera +, -, *, /, ++, --,  &&, ||, <, <=, >, >=, ==, !=, ;, ',', ., (, ), [, ], ^, #, end, then, fnpara, do, of, else o romper.
+Se espera +, -, *, /, &&, ||, <, <=, >, >=, ==, !=, ;, ',', ., ), ], =, +=, -=, *=, /=, ^, #,  end, then, fnpara, do, of, else o romper.
+Se espera id, const entero, const real, const exponencial, const caracter, const cadena, +, -, !, expo, true, false, limpiarpantalla, sqrt, sqr, strins, strlen, open, close, asc, chr, strcmp, strcat, strcpy, toupper, tolower, scanf o printf.
+Se espera limpiarpantalla, sqrt, sqr, strins, strlen, open, close, asc, chr, strcmp, strcat, strcpy, toupper, tolower, scanf o printf.
