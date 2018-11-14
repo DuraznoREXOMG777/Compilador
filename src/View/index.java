@@ -124,7 +124,7 @@ public class index extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        cmbLineas = new javax.swing.JComboBox<>();
+        cmbLineas = new javax.swing.JComboBox<String>();
         jLabel2 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -173,7 +173,7 @@ public class index extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
 
         fc.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
-        fc.setSelectedFile(new java.io.File("C:\\Program Files\\NetBeans 8.2\\AntonioLopez 19-03-18.xlsx"));
+        fc.setSelectedFile(new java.io.File("C:\\Program Files\\NetBeans 8.0.1\\AntonioLopez 15-11-18.xlsx"));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -878,10 +878,15 @@ public class index extends javax.swing.JFrame {
             try {
                 if(listaErrores.get(i).getTipoError().equals("Léxico"))
                     painter = (new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 53, 53)));
+                else if(listaErrores.get(i).getTipoError().equals("Semántica 1"))
+                    painter = (new DefaultHighlighter.DefaultHighlightPainter(new Color(197, 168, 154)));
                 else if(listaErrores.get(i).getTipoError().equals("Ambito"))
                     painter = (new DefaultHighlighter.DefaultHighlightPainter(new Color(172, 255, 48)));
-                else
+                else if(listaErrores.get(i).getTipoError().equals("Semántica 2"))
                     painter = (new DefaultHighlighter.DefaultHighlightPainter(new Color(33, 152, 161)));
+                else{
+                    painter = (new DefaultHighlighter.DefaultHighlightPainter(new Color(99, 127, 151)));
+                }
                 taBase.getHighlighter().addHighlight(taBase.getLineStartOffset((listaErrores.get(i).getLinea()-1)), taBase.getLineEndOffset((listaErrores.get(i).getLinea()-1)), painter);
             } catch (BadLocationException ex) {
                 Logger.getLogger(index.class.getName()).log(Level.SEVERE, null, ex);

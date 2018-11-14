@@ -253,11 +253,13 @@ public class LexicAnalyzer {
          Semántica 3
          */
         LinkedList<Variable> scanf = new LinkedList();
-        LinkedList<Variable> open = new LinkedList();
-        LinkedList<Variable> strins = new LinkedList();
-        LinkedList<Variable> strcat = new LinkedList();
+        Stack<Variable> open = new Stack();
+        Stack<Variable> strins = new Stack();
+        Stack<Variable> strcat = new Stack();
         Stack<Variable> expo = new Stack();
         Stack<String> pilaFunciones = new Stack();
+
+        Stack<Boolean> funcionPascal = new Stack();
 
         boolean strCpy = false;
         boolean strCat = false;
@@ -290,8 +292,8 @@ public class LexicAnalyzer {
 
         tokenList.add(new Token(-95, "$", base.length)); //Se puede eliminar.
 
-        pilaSintactica.add(-95);
-        pilaSintactica.add(1);
+        pilaSintactica.push(-95);
+        pilaSintactica.push(1);
         pilaAmbito.push(0);
 
         while (!pilaSintactica.empty()) {
@@ -353,6 +355,12 @@ public class LexicAnalyzer {
                 }
                 valoresSemantica.add(sm2);
                 pilaSintactica.pop();
+            } else if (pilaSintactica.peek() == 3001) {
+                funcionPascal.pop();
+                pilaSintactica.pop();
+            } else if (pilaSintactica.peek() == 3000) {
+                funcionPascal.push(true);
+                pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 2003) {
                 masMas = true;
                 pilaSintactica.pop();
@@ -364,7 +372,11 @@ public class LexicAnalyzer {
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 1002) {
                 sigueEXP = false;
-
+                
+                if(!pilaOperando.isEmpty()){
+                    Variable var = pilaOperando.pop();
+                    errorList.add(new Errores(581, var.getTipo(), tokenList.getFirst().getLinea(), "No se ha asignado valor.", "Semántica 2"));
+                }
                 contadorTemporales = new int[8];
                 pilaOperando = new Stack();
                 pilaOperador = new Stack();
@@ -382,6 +394,17 @@ public class LexicAnalyzer {
             } else if (pilaSintactica.peek() == 391) {
                 conSigno = true;
                 pilaSintactica.pop();
+            } else if (pilaSintactica.peek() == 375) {
+                Semantica2 sm3 = new Semantica2();
+                sm3.setRegla("limpiarpantalla");
+                sm3.setTp("limpiarpantalla/14");
+                sm3.setLinea("" + tokenList.getFirst().getLinea());
+                sm3.setAmbito("" + pilaAmbito.peek());
+                sm3.setValorr("void");
+                sm3.setEstado("Aceptado");
+                valoresSemantica.add(sm3);
+
+                pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 370) {
                 if (pilaOperando.size() > 0) { //Revisar que tenga algo.
                     Variable expPascalSqrt = new Variable();
@@ -390,14 +413,35 @@ public class LexicAnalyzer {
                     } else {
                         expPascalSqrt = pilaOperando.pop();
                     }
-                    if (Ut.isNumerical(expPascalSqrt.getTipo())) {
 
+                    Semantica2 sm4 = new Semantica2();
+                    sm4.setRegla("sqrt-P1");
+                    sm4.setTp("valor/8");
+                    sm4.setLinea("" + tokenList.getFirst().getLinea());
+                    sm4.setAmbito("" + pilaAmbito.peek());
+                    sm4.setValorr(Ut.semanticaTresNombre(expPascalSqrt));
+
+                    if (Ut.isNumerical(expPascalSqrt.getTipo())) {
+                        sm4.setEstado("Aceptado");
                     } else {
+                        sm4.setEstado("Error");
                         errorList.add(new Errores(581, expPascalSqrt.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'sqrtt'.", "Semántica 3"));
                     }
 
+                    valoresSemantica.add(sm4);
+
                     Variable sqrtVariable = new Variable();
                     sqrtVariable.setTipo("integer");
+
+                    Semantica2 sm3 = new Semantica2();
+                    sm3.setRegla("sqrt");
+                    sm3.setTp("sqrt/10");
+                    sm3.setLinea("" + tokenList.getFirst().getLinea());
+                    sm3.setAmbito("" + pilaAmbito.peek());
+                    sm3.setValorr("integer");
+                    sm3.setEstado("Aceptado");
+                    valoresSemantica.add(sm3);
+
                     if (funcionAnidada > 0 || arrayAnidado > 0) {
                         pilaOperandoArr.push(sqrtVariable);
                     } else {
@@ -416,23 +460,49 @@ public class LexicAnalyzer {
                     } else {
                         expPascalSqr = pilaOperando.pop();
                     }
-                    if (Ut.isNumerical(expPascalSqr.getTipo())) {
 
+                    Semantica2 sm4 = new Semantica2();
+                    sm4.setRegla("sqr-P1");
+                    sm4.setTp("valor/1");
+                    sm4.setLinea("" + tokenList.getFirst().getLinea());
+                    sm4.setAmbito("" + pilaAmbito.peek());
+                    sm4.setValorr(Ut.semanticaTresNombre(expPascalSqr));
+
+                    if (Ut.isNumerical(expPascalSqr.getTipo())) {
+                        sm4.setEstado("Aceptado");
                     } else {
+                        sm4.setEstado("Error");
                         errorList.add(new Errores(580, expPascalSqr.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'sqr'.", "Semántica 3"));
                     }
 
+                    valoresSemantica.add(sm4);
+
                     Variable sqrVariable = new Variable();
                     String tipo = "";
+                    String estado = "";
                     if (Ut.isNumerical(expPascalSqr.getTipo())) {
                         if (expPascalSqr.getTipo().equals("char") || expPascalSqr.getTipo().equals("integer")) {
                             tipo = "integer";
                         } else if (expPascalSqr.getTipo().equals("real") || expPascalSqr.getTipo().equals("exp")) {
                             tipo = "expo";
                         }
+                        estado = "Aceptado";
                     } else {
+                        estado = "Error";
                         tipo = "varian";
                     }
+
+                    Semantica2 sm3 = new Semantica2();
+                    sm3.setRegla("sqr");
+                    sm3.setTp("sqr/15");
+                    sm3.setLinea("" + tokenList.getFirst().getLinea());
+                    sm3.setAmbito("" + pilaAmbito.peek());
+                    sm3.setValorr(tipo);
+                    sm3.setEstado(estado);
+                    valoresSemantica.add(sm3);
+
+                    sqrVariable.setTipo(tipo);
+
                     if (funcionAnidada > 0 || arrayAnidado > 0) {
                         pilaOperandoArr.push(sqrVariable);
                     } else {
@@ -448,27 +518,62 @@ public class LexicAnalyzer {
                     Variable expoSecond = expo.pop();
                     Variable expoFirst = expo.pop();
 
-                    if (Ut.isNumerical(expoFirst.getTipo())) {
+                    Semantica2 sm4 = new Semantica2();
+                    sm4.setRegla("expo-P1");
+                    sm4.setTp("valor/1");
+                    sm4.setLinea("" + tokenList.getFirst().getLinea());
+                    sm4.setAmbito("" + pilaAmbito.peek());
+                    sm4.setValorr(Ut.semanticaTresNombre(expoFirst));
 
+                    Semantica2 sm5 = new Semantica2();
+                    sm5.setRegla("expo-P2");
+                    sm5.setTp("integer/2");
+                    sm5.setLinea("" + tokenList.getFirst().getLinea());
+                    sm5.setAmbito("" + pilaAmbito.peek());
+                    sm5.setValorr(Ut.semanticaTresNombre(expoSecond));
+
+                    if (Ut.isNumerical(expoFirst.getTipo())) {
+                        sm4.setEstado("Aceptado");
                     } else {
+                        sm4.setEstado("Error");
                         errorList.add(new Errores(579, expoSecond.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'expo', parámetro 1, se espera númerico.", "Semántica 3"));
                     }
 
                     if (expoSecond.getTipo().equals("integer")) {
-
+                        sm5.setEstado("Aceptado");
                     } else {
+                        sm5.setEstado("Error");
                         errorList.add(new Errores(579, expoSecond.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'expo', parámetro 2, se espera integer.", "Semántica 3"));
                     }
 
+                    valoresSemantica.add(sm4);
+                    valoresSemantica.add(sm5);
+
                     String tipo = "";
+                    String estado = "";
                     if (Ut.isNumerical(expoFirst.getTipo())) {
-                        if (expoFirst.getTipo().equals("char") || expoFirst.getTipo().equals("integer")) {
-                            tipo = "integer";
-                        } else if (expoFirst.getTipo().equals("real") || expoFirst.getTipo().equals("exp")) {
-                            tipo = "expo";
-                        }
+                        tipo = Ut.ruleOneUp(expoFirst.getTipo());
+                        estado = "Aceptado";
                     } else {
+                        estado = "Error";
                         tipo = "varian";
+                    }
+
+                    Semantica2 sm3 = new Semantica2();
+                    sm3.setRegla("expo");
+                    sm3.setTp("expo/17");
+                    sm3.setLinea("" + tokenList.getFirst().getLinea());
+                    sm3.setAmbito("" + pilaAmbito.peek());
+                    sm3.setValorr(tipo);
+                    sm3.setEstado(estado);
+                    valoresSemantica.add(sm3);
+
+                    Variable expoVariable = new Variable();
+                    expoVariable.setTipo(tipo);
+                    if (funcionAnidada > 0 || arrayAnidado > 0) {
+                        pilaOperandoArr.push(expoVariable);
+                    } else {
+                        pilaOperando.push(expoVariable);
                     }
                 }
                 pilaSintactica.pop();
@@ -487,23 +592,50 @@ public class LexicAnalyzer {
 
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 363) {
-                if (strCat) {
-                    Variable strFirst = strcat.getFirst();
-                    strcat.removeFirst();
-                    Variable strSecond = strcat.getFirst();
-                    strcat.removeFirst();
+                String tipo = pilaFunciones.pop();
+                if (tipo.equals("strcpy") || tipo.equals("strcat")) {
+                    Variable strSecond = strcat.pop();
+                    Variable strFirst = strcat.pop();
 
-                    if (!strFirst.getTipo().equals("string")) {
+                    Semantica2 sm4 = new Semantica2();
+                    sm4.setRegla(tipo + "-P1");
+                    sm4.setTp("string/3");
+                    sm4.setLinea("" + tokenList.getFirst().getLinea());
+                    sm4.setAmbito("" + pilaAmbito.peek());
+                    sm4.setValorr(Ut.semanticaTresNombre(strFirst));
 
+                    Semantica2 sm5 = new Semantica2();
+                    sm5.setRegla(tipo + "-P2");
+                    sm5.setTp("string/3");
+                    sm5.setLinea("" + tokenList.getFirst().getLinea());
+                    sm5.setAmbito("" + pilaAmbito.peek());
+                    sm5.setValorr(Ut.semanticaTresNombre(strSecond));
+
+                    if (strFirst.getTipo().equals("string")) {
+                        sm4.setEstado("Aceptado");
                     } else {
+                        sm4.setEstado("Error");
                         errorList.add(new Errores(578, strFirst.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'strCat'.", "Semántica 3"));
                     }
 
-                    if (!strSecond.getTipo().equals("string")) {
-
+                    if (strSecond.getTipo().equals("string")) {
+                        sm5.setEstado("Aceptado");
                     } else {
+                        sm5.setEstado("Error");
                         errorList.add(new Errores(578, strFirst.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'strCat', se espera string.", "Semántica 3"));
                     }
+
+                    valoresSemantica.add(sm4);
+                    valoresSemantica.add(sm5);
+
+                    Semantica2 sm3 = new Semantica2();
+                    sm3.setRegla(tipo);
+                    sm3.setTp(tipo + "/12");
+                    sm3.setLinea("" + tokenList.getFirst().getLinea());
+                    sm3.setAmbito("" + pilaAmbito.peek());
+                    sm3.setValorr("string");
+                    sm3.setEstado("Aceptado");
+                    valoresSemantica.add(sm3);
 
                     Variable strVariable = new Variable();
                     strVariable.setTipo("string");
@@ -512,27 +644,50 @@ public class LexicAnalyzer {
                     } else {
                         pilaOperando.push(strVariable);
                     }
-                } else if (strCpy) {
-                    Variable strFirst = strcat.getFirst();
-                    strcat.removeFirst();
-                    Variable strSecond = strcat.getFirst();
-                    strcat.removeFirst();
 
-                    if (!strFirst.getNombre().equals("") || strFirst.getNombre().equals("-")) {
-                        if (!strFirst.getTipo().equals("string")) {
+                } else if (tipo.equals("strcmp")) {
+                    Variable strSecond = strcat.pop();
+                    Variable strFirst = strcat.pop();
 
-                        } else {
-                            errorList.add(new Errores(577, strFirst.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'str'.", "Semántica 3"));
-                        }
+                    Semantica2 sm4 = new Semantica2();
+                    sm4.setRegla(tipo + "-P1");
+                    sm4.setTp("string/3");
+                    sm4.setLinea("" + tokenList.getFirst().getLinea());
+                    sm4.setAmbito("" + pilaAmbito.peek());
+                    sm4.setValorr(Ut.semanticaTresNombre(strFirst));
+
+                    Semantica2 sm5 = new Semantica2();
+                    sm5.setRegla(tipo + "-P2");
+                    sm5.setTp("string/3");
+                    sm5.setLinea("" + tokenList.getFirst().getLinea());
+                    sm5.setAmbito("" + pilaAmbito.peek());
+                    sm5.setValorr(Ut.semanticaTresNombre(strSecond));
+
+                    if (strFirst.getTipo().equals("string")) {
+                        sm4.setEstado("Aceptado");
                     } else {
-                        errorList.add(new Errores(577, "value", tokenList.getFirst().getLinea(), "Tipo de valor mal ingresado en función 'str'.", "Semántica 3"));
+                        sm4.setEstado("Error");
+                        errorList.add(new Errores(577, strFirst.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'str'.", "Semántica 3"));
                     }
 
-                    if (!strSecond.getTipo().equals("string")) {
-
+                    if (strSecond.getTipo().equals("string")) {
+                        sm5.setEstado("Aceptado");
                     } else {
+                        sm5.setEstado("Error");
                         errorList.add(new Errores(577, strFirst.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'str', se espera string.", "Semántica 3"));
                     }
+
+                    valoresSemantica.add(sm4);
+                    valoresSemantica.add(sm5);
+
+                    Semantica2 sm3 = new Semantica2();
+                    sm3.setRegla("strcmp");
+                    sm3.setTp("strcmp/13");
+                    sm3.setLinea("" + tokenList.getFirst().getLinea());
+                    sm3.setAmbito("" + pilaAmbito.peek());
+                    sm3.setValorr("bool");
+                    sm3.setEstado("Aceptado");
+                    valoresSemantica.add(sm3);
 
                     Variable strVariable = new Variable();
                     strVariable.setTipo("bool");
@@ -551,14 +706,17 @@ public class LexicAnalyzer {
                     } else {
                         expPascalStrC = pilaOperando.pop();
                     }
-                    strcat.add(expPascalStrC);
+                    strcat.push(expPascalStrC);
                 }
                 pilaSintactica.pop();
+            } else if (pilaSintactica.peek() == 373) {
+                pilaFunciones.push("strcmp");
+                pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 361) {
-                strCat = true;
+                pilaFunciones.push("strcat");
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 360) {
-                strCpy = true;
+                pilaFunciones.push("strcpy");
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 359) {
                 if (pilaOperando.size() > 0) { //Revisar que tenga algo.
@@ -568,38 +726,74 @@ public class LexicAnalyzer {
                     } else {
                         expPascalstrins = pilaOperando.pop();
                     }
-                    strins.add(expPascalstrins);
+                    strins.push(expPascalstrins);
                 }
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 358) {
-                Variable strinsFirst = strins.getFirst();
-                strins.removeFirst();
-                Variable strinsSecond = strins.getFirst();
-                strins.removeFirst();
-                Variable strinsThird = strins.getFirst();
-                strins.removeFirst();
+                Variable strinsThird = strins.pop();
+                Variable strinsSecond = strins.pop();
+                Variable strinsFirst = strins.pop();
+
+                Semantica2 sm4 = new Semantica2();
+                sm4.setRegla("strins-P1");
+                sm4.setTp("string/9");
+                sm4.setLinea("" + tokenList.getFirst().getLinea());
+                sm4.setAmbito("" + pilaAmbito.peek());
+                sm4.setValorr(Ut.semanticaTresNombre(strinsFirst));
+
+                Semantica2 sm5 = new Semantica2();
+                sm5.setRegla("strins-P2");
+                sm5.setTp("string/3");
+                sm5.setLinea("" + tokenList.getFirst().getLinea());
+                sm5.setAmbito("" + pilaAmbito.peek());
+                sm5.setValorr(Ut.semanticaTresNombre(strinsSecond));
+
+                Semantica2 sm6 = new Semantica2();
+                sm6.setRegla("strins-P3");
+                sm6.setTp("integer/2");
+                sm6.setLinea("" + tokenList.getFirst().getLinea());
+                sm6.setAmbito("" + pilaAmbito.peek());
+                sm6.setValorr(Ut.semanticaTresNombre(strinsThird));
 
                 if (!strinsFirst.getNombre().equals("") || strinsFirst.getNombre().equals("-")) {
-                    if (!strinsFirst.getTipo().equals("string")) {
-
+                    if (strinsFirst.getTipo().equals("string")) {
+                        sm4.setEstado("Aceptado");
                     } else {
+                        sm4.setEstado("Error");
                         errorList.add(new Errores(575, strinsFirst.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'strins'.", "Semántica 3"));
                     }
                 } else {
+                    sm4.setEstado("Error");
                     errorList.add(new Errores(575, "value", tokenList.getFirst().getLinea(), "Tipo de valor mal ingresado en función 'strins'.", "Semántica 3"));
                 }
 
-                if (!strinsSecond.getTipo().equals("string")) {
-
+                if (strinsSecond.getTipo().equals("string")) {
+                    sm5.setEstado("Aceptado");
                 } else {
-                    errorList.add(new Errores(575, strinsFirst.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'strins', se espera string.", "Semántica 3"));
+                    sm5.setEstado("Error");
+                    errorList.add(new Errores(575, strinsSecond.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'strins', se espera string.", "Semántica 3"));
                 }
 
-                if (!strinsThird.getTipo().equals("integer")) {
+                if (strinsThird.getTipo().equals("integer")) {
+                    sm6.setEstado("Aceptado");
 
                 } else {
-                    errorList.add(new Errores(575, strinsFirst.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'strins'. Se espera integer.", "Semántica 3"));
+                    sm6.setEstado("Aceptado");
+                    errorList.add(new Errores(575, strinsThird.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'strins'. Se espera integer.", "Semántica 3"));
                 }
+
+                valoresSemantica.add(sm4);
+                valoresSemantica.add(sm5);
+                valoresSemantica.add(sm6);
+
+                Semantica2 sm3 = new Semantica2();
+                sm3.setRegla("strins");
+                sm3.setTp("strins/12");
+                sm3.setLinea("" + tokenList.getFirst().getLinea());
+                sm3.setAmbito("" + pilaAmbito.peek());
+                sm3.setValorr("bool");
+                sm3.setEstado("Aceptado");
+                valoresSemantica.add(sm3);
 
                 Variable toVariable = new Variable();
                 toVariable.setTipo("bool");
@@ -620,12 +814,29 @@ public class LexicAnalyzer {
                     } else {
                         expPascalLen = pilaOperando.pop();
                     }
+                    Semantica2 sm2 = new Semantica2();
+                    sm2.setRegla("strlen-P1");
+                    sm2.setTp("string/3");
+                    sm2.setLinea("" + tokenList.getFirst().getLinea());
+                    sm2.setAmbito("" + pilaAmbito.peek());
+                    sm2.setValorr(Ut.semanticaTresNombre(expPascalLen));
 
                     if (expPascalLen.getTipo().equals("string")) {
-
+                        sm2.setEstado("Aceptado");
                     } else {
+                        sm2.setEstado("Error");
                         errorList.add(new Errores(576, expPascalLen.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'strlen'.", "Semántica 3"));
                     }
+                    valoresSemantica.add(sm2);
+
+                    Semantica2 sm3 = new Semantica2();
+                    sm3.setRegla("strlen");
+                    sm3.setTp("strlen/10");
+                    sm3.setLinea("" + tokenList.getFirst().getLinea());
+                    sm3.setAmbito("" + pilaAmbito.peek());
+                    sm3.setValorr("integer");
+                    sm3.setEstado("Aceptado");
+                    valoresSemantica.add(sm3);
 
                     Variable toVariable = new Variable();
                     toVariable.setTipo("integer");
@@ -634,6 +845,7 @@ public class LexicAnalyzer {
                     } else {
                         pilaOperando.push(toVariable);
                     }
+
                 }
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 355) {
@@ -647,15 +859,43 @@ public class LexicAnalyzer {
                     } else {
                         expPascalTo = pilaOperando.pop();
                     }
-
-                    if (expPascalTo.getTipo().equals("string") || expPascalTo.getTipo().equals("char")) {
-
+                    String tipoFunc = pilaFunciones.pop();
+                    Semantica2 sm2 = new Semantica2();
+                    sm2.setRegla(tipoFunc + "-P1");
+                    sm2.setTp("valor/4");
+                    sm2.setLinea("" + tokenList.getFirst().getLinea());
+                    sm2.setAmbito("" + pilaAmbito.peek());
+                    sm2.setValorr(Ut.semanticaTresNombre(expPascalTo));
+                    if (expPascalTo.getTipo().equals("string") || expPascalTo.getTipo().equals("char")
+                            || expPascalTo.getTipo().equals("varian")) {
+                        sm2.setEstado("Aceptado");
                     } else {
+                        sm2.setEstado("Error");
                         errorList.add(new Errores(574, expPascalTo.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato mal ingresado en función 'toLower/toUpper'.", "Semántica 3"));
                     }
+                    
+                    valoresSemantica.add(sm2);
+                    
+                    String tipo;
+                    if (expPascalTo.getTipo().equals("char")) {
+                        tipo = "char";
+                    } else if (expPascalTo.getTipo().equals("string")) {
+                        tipo = "string";
+                    } else {
+                        tipo = "varian";
+                    }
+
+                    Semantica2 sm3 = new Semantica2();
+                    sm3.setRegla(tipoFunc);
+                    sm3.setTp(tipoFunc + "/16");
+                    sm3.setLinea("" + tokenList.getFirst().getLinea());
+                    sm3.setAmbito("" + pilaAmbito.peek());
+                    sm3.setValorr(tipo);
+                    sm3.setEstado("Aceptado");
+                    valoresSemantica.add(sm3);
 
                     Variable toVariable = new Variable();
-                    String tipo = (expPascalTo.getTipo().equals("char")) ? "char" : "string";
+
                     toVariable.setTipo(tipo);
                     if (funcionAnidada > 0 || arrayAnidado > 0) {
                         pilaOperandoArr.push(toVariable);
@@ -666,21 +906,41 @@ public class LexicAnalyzer {
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 353) {
                 pilaSintactica.pop();
+            } else if (pilaSintactica.peek() == 372) {
+                pilaFunciones.push("toLower");
+                pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 352) {
-
+                pilaFunciones.push("toUpper");
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 351) {
                 for (int i = 0; i < open.size(); i++) {
                     Variable var = open.get(i);
+
+                    Semantica2 sm2 = new Semantica2();
+                    sm2.setRegla("open-P" + (i + 2));
+                    sm2.setTp("valor/6");
+                    sm2.setLinea("" + tokenList.getFirst().getLinea());
+                    sm2.setAmbito("" + pilaAmbito.peek());
+                    sm2.setValorr(Ut.semanticaTresNombre(var));
                     //Aquí o arriba.
                     if (!var.getTipo().equals("string")) {
                         errorList.add(new Errores(573, var.getTipo(), tokenList.getFirst().getLinea(), "Tipo de dato erróneo en función 'open', parametro " + (i + 1), "Semántica 3"));
-                        break; //Si llega un file deja de marcar loos demás como error.
+                        sm2.setEstado("Error");
                     } else {
-
+                        sm2.setEstado("Aceptado");
                     }
+                    valoresSemantica.add(sm2);
                 }
                 //Sigo metiendo el tipo de dato.
+                Semantica2 sm3 = new Semantica2();
+                sm3.setRegla("open");
+                sm3.setTp("open/13");
+                sm3.setLinea("" + tokenList.getFirst().getLinea());
+                sm3.setAmbito("" + pilaAmbito.peek());
+                sm3.setValorr("bool");
+                sm3.setEstado("Aceptado");
+                valoresSemantica.add(sm3);
+
                 Variable boolOpen = new Variable();
                 boolOpen.setTipo("bool");
                 if (funcionAnidada > 0 || arrayAnidado > 0) {
@@ -708,25 +968,35 @@ public class LexicAnalyzer {
                     } else {
                         expPascalOpen = pilaOperando.pop();
                     }
-                    if (expPascalOpen.getTipo().equals("file")) {
 
+                    Semantica2 sm2 = new Semantica2();
+                    sm2.setRegla("open-P1");
+                    sm2.setTp("file/5");
+                    sm2.setLinea("" + tokenList.getFirst().getLinea());
+                    sm2.setAmbito("" + pilaAmbito.peek());
+                    sm2.setValorr(Ut.semanticaTresNombre(expPascalOpen));
+
+                    if (expPascalOpen.getTipo().equals("file")) {
+                        sm2.setEstado("Aceptado");
                     } else {
+                        sm2.setEstado("Error");
                         errorList.add(new Errores(572, expPascalOpen.getTipo(), tokenList.getFirst().getLinea(), "Tipo de identificador erróneo en función 'open', se espera file", "Semántica 3"));
                     }
+                    valoresSemantica.add(sm2);
                 }
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 348) {
                 Variable boolClose = new Variable();
-                
+
                 Semantica2 sm3 = new Semantica2();
                 sm3.setRegla("close");
-                sm3.setTp("close/15");
+                sm3.setTp("close/13");
                 sm3.setLinea("" + tokenList.getFirst().getLinea());
                 sm3.setAmbito("" + pilaAmbito.peek());
                 sm3.setValorr("bool");
                 sm3.setEstado("Aceptado");
                 valoresSemantica.add(sm3);
-                
+
                 boolClose.setTipo("bool");
                 if (funcionAnidada > 0 || arrayAnidado > 0) {
                     pilaOperandoArr.push(boolClose);
@@ -821,7 +1091,7 @@ public class LexicAnalyzer {
 
                 Semantica2 sm3 = new Semantica2();
                 sm3.setRegla(tipo);
-                sm3.setTp(tipo + "/15");
+                sm3.setTp(tipo + "/13");
                 sm3.setLinea("" + tokenList.getFirst().getLinea());
                 sm3.setAmbito("" + pilaAmbito.peek());
                 sm3.setValorr("bool");
@@ -840,6 +1110,7 @@ public class LexicAnalyzer {
                 pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 371) {
                 pilaFunciones.push("scanf");
+                pilaSintactica.pop();
             } else if (pilaSintactica.peek() == 343) {
                 pilaFunciones.push("printf");
                 pilaSintactica.pop();
@@ -913,7 +1184,7 @@ public class LexicAnalyzer {
 
                     Semantica2 sm3 = new Semantica2();
                     sm3.setRegla("asc");
-                    sm3.setTp("asc/9");
+                    sm3.setTp("asc/10");
                     sm3.setLinea("" + tokenList.getFirst().getLinea());
                     sm3.setAmbito("" + pilaAmbito.peek());
                     sm3.setValorr("integer");
@@ -1074,7 +1345,7 @@ public class LexicAnalyzer {
                         }
                         valoresSemantica.add(sm2);
                     }
-                    //Terminar regla 10 y 11.
+                        //Terminar regla 10 y 11.
 
                     //errorNoEsArreglo = true;
                 } else {
@@ -1360,7 +1631,7 @@ public class LexicAnalyzer {
             } else if (pilaSintactica.peek() == 316) {
 
                 entraEXP = true;
-                if (!(sigueEXP && (arregloVerificar || empiezaFuncion))) {
+                if (!(sigueEXP && (arregloVerificar || empiezaFuncion || !funcionPascal.isEmpty()))) {
                     pilaOperando = new Stack();
                     pilaOperador = new Stack();
                     contadorTemporales = new int[8];
@@ -1480,7 +1751,7 @@ public class LexicAnalyzer {
                 pilaSintactica.pop();
                 listaPar = true;
             } else if (pilaSintactica.peek() == 313) {
-                //Tipo de Dato
+                    //Tipo de Dato
 
                 //Aquí actualizaremos los datos de nuestra función.
                 if (!duplicatedMethod) {
@@ -1578,7 +1849,7 @@ public class LexicAnalyzer {
                 }
 
                 pilaSintactica.pop();
-                //Al llegar 306 se acaba la declaración.
+                    //Al llegar 306 se acaba la declaración.
 
                 //Crear las variables.
                 if (pilaIDs.size() > 0 && !decArray) {
@@ -2675,7 +2946,7 @@ public class LexicAnalyzer {
                         }
                     } else {
                         sm2.setEstado("Aceptado");
-                        errorList.add(new Errores(559, v2.getNombre() + " = " + v1.getTipo(), lineaError, "No se le puedde asignar a un " + v2.getClase(), "Semántica 2"));
+                        errorList.add(new Errores(559, v2.getNombre() + " = " + v1.getTipo(), lineaError, "No se le puede asignar a un " + v2.getClase(), "Semántica 2"));
                     }
                     valoresSemantica.add(sm2);
 

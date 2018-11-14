@@ -613,6 +613,20 @@ public class Ut {
         }
         return "";
     }
+    
+    public static String ruleOneUp(String tipo) {
+        switch (tipo) {
+            case "real":
+                return "exp";
+            case "exp":
+                return "exp";
+            case "integer":
+                return "real";
+            case "char":
+                return "integer";
+        }
+        return "";
+    }
 
     public static boolean isCaseable(String tipo) {
         switch (tipo) {
@@ -727,19 +741,19 @@ public class Ut {
         {38}, //DECLARACIONCONSTANTES 82
         {-4}, //B1 83
         {-3}, //B1 84
-        {-30, -29, -79}, //FUNCIONES 85
+        {375, -30, -29, -79}, //FUNCIONES 85
         {-30, 317, 370, 22, 316, -29, -80, 369}, //FUNCIONES 86
         {-30, 317, 368, 22, 316, -29, -81, 367}, //FUNCIONES 87
         {366, -30, 317, 365, 22, 316, -27, 317, 365, 22, 316, -29, -53, 364}, //FUNCIONES 88
-        {363, 48, -88, 360}, //FUNCIONES 89
-        {363, 48, -89, 361}, //FUNCIONES 90
-        {363, 48, -90, 360}, //FUNCIONES 91
-        {-30, 317, 359, 22, 316, -27, 
+        {363, 48, -88, 373}, //FUNCIONES 89 strcmp
+        {363, 48, -89, 361}, //FUNCIONES 90 strcpy
+        {363, 48, -90, 360}, //FUNCIONES 91 strcat
+        {-30, 358,317, 359, 22, 316, -27, 
              317, 359, 22, 316,  -27, 
-             317, 359, 22, 316,  -29, -82}, //FUNCIONES 92 strins
+             317, 359, 22, 316,  -29, -82, 357}, //FUNCIONES 92 strins
         {-30,  317, 356, 22, 316,  -29, -83, 355}, //FUNCIONES 93 strLen
         {353, 49, -91, 352}, //FUNCIONES 94 toUpper
-        {353, 49, -92, 352}, //FUNCIONES 95 toLower
+        {353, 49, -92, 372}, //FUNCIONES 95 toLower
         {351, -30,  317, 350, 22, 316,  -27,  317, 350, 22, 316,  -27, 317, 349,-1, 316, -29, -84}, //FUNCIONES 96
         {348, -30, 317, 347,-1, 316, -29, -85}, //FUNCIONES 97 close ( id )
         {344, 50, -93, 371}, //FUNCIONES 98 scanf
@@ -752,7 +766,7 @@ public class Ut {
         {51,  317, 346, 22, 316,  -27}, //F1 105 , EXPPASCAL F1
         {38}, //FACTORPASCAL 106
         {319, -30, 22, -29, -15}, //FACTORPASCAL 107 --NOT -15 / -95
-        {401, 47, 400}, //FACTORPASCAL 108
+        {3001, 47, 3000}, //FACTORPASCAL 108
         {43, -1}, //FACTORPASCAL 109
         {2005, 43, 319, -1, -13, 2003}, //FACTORPASCAL 110
         {2005, 43, 319, -1, -14, 2003}, //FACTORPASCAL 111
@@ -830,7 +844,7 @@ public class Ut {
     
     public static String semanticaTresNombre(Variable var){
         String nombre = "";
-        if(var.getNombre().equals("") || !var.getNombre().equals(""))
+        if(!(var.getClase().equals("arr") || var.getClase().equals("var")))
             nombre = "valor/";
         else
             nombre = "id/";
